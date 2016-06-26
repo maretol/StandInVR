@@ -154,7 +154,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DxData.cpp" />
     <ClCompile Include="MainData.cpp" />
+    <ClCompile Include="VrData.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DxData.h" />
+    <ClInclude Include="VrData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
