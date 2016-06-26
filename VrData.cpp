@@ -7,3 +7,7 @@ VrData::VrData() {
 VrData::~VrData() {
 
 }
+
+void VrData::Init() {
+
+}
