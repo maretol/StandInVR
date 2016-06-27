@@ -9,6 +9,6 @@ public:
 protected:
 
 private:
-
-
+	void getHeadTracking();
+	void getPositionTracking();
 };
