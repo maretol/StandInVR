@@ -17,5 +17,7 @@
 int WINAPI WinMain(HINSTANCE hins, HINSTANCE hpreins, LPSTR lpcmdline, int nCmdShow) {
 	VrData *vd = new VrData();
 	vd->Init();
+
+	delete vd;
 	return 0;
 }
