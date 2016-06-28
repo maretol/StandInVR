@@ -12,5 +12,6 @@ public:
 	~DxData();
 	void Init();
 	void setOutputDevice(OUTPUTDEVICE output);
+	void DxMain();
 };
 
