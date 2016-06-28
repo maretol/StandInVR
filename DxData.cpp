@@ -5,13 +5,13 @@ DxData::DxData() {
 
 }
 
-
 DxData::~DxData() {
+}
+
+void DxData::setOutputDevice(OUTPUTDEVICE output) {
 
 }
 
 void DxData::Init() {
 
 }
-
-void DxData::setOutputDevice(OUTPUTDEVICE output) {}

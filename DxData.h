@@ -1,4 +1,7 @@
 #pragma once
+#include <DxLib.h>
+
+
 class DxData {
 public:
 	enum OUTPUTDEVICE {
