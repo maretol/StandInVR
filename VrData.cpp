@@ -1,4 +1,8 @@
 #include "VrData.h"
+#include "DxLib.h"
+
+
+// ƒvƒƒOƒ‰ƒ€‚Í WinMain ‚©‚çn‚Ü‚è‚Ü‚·
 
 VrData::VrData() {
 	dd = new DxData();

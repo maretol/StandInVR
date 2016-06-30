@@ -1,5 +1,8 @@
 //written by Yusei
 #include "DxData.h"
+#include "DxLib.h"
+
+// プログラムは WinMain から始まります
 
 DxData::DxData() {
 	// コンストラクタ。クラス変数などを定義したい場合ここを使う
@@ -32,7 +35,8 @@ void DxData::DxMain() {
 	// ここにグラフィック処理を記入
 
 	DrawPixel(320, 240, GetColor(255, 255, 255));
-
+	DrawPixel(320, 230, GetColor(255, 200, 0));
+	DrawBox(32, 42, 36, 65, GetColor(43, 43, 255), true);
 	WaitKey();
 	DxLib_End();
 }
