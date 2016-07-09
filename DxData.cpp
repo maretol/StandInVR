@@ -35,142 +35,179 @@ void DxData::Init() {
 void DxData::DxMain() {
 	// ここにグラフィック処理を記入
 
-	DrawPixel(170, 56, GetColor(34, 200, 240));
-	DrawPixel(320, 230, GetColor(255, 24, 0));
-	DrawOval(200, 45, 350, 240, GetColor(43, 43, 212), true);
+	VERTEX3DSHADER Vertex[4];
+	unsigned short Index[6];
+	int vshandle;
+	int pshandle;
+	int texhandle;
+	int x;
+	int xadd;
+	float color;
+	float coloradd;
+	int ModelHandle;
+	FLOAT4 f4;
 
-	//キー取得用配列
-	char key[256];
+	// 2D
 
-	//x座標
-	int x = 300, y = 240;
+	DrawBox(0, 0, 640, 480, GetColor(200, 200, 200), TRUE);	// 画面全体を希望の色で塗りつぶす
 
-	//グラフィックハンドル格納用配列
-	int gh[12];
 
-	//画像読み込み
-	if (LoadDivGraph("charall.png", 12, 3, 4, 49, 66, gh) == -1) {
-		WaitKey();
-		return;
+	//3D
+
+	// Ｚバッファを有効にする
+	SetUseZBuffer3D(TRUE);
+
+	// Ｚバッファへの書き込みを有効にする
+	SetWriteZBuffer3D(TRUE);
+
+	// ３Ｄ空間上にカプセルを描画する
+	DrawCapsule3D(VGet(320.0f, 100.0f, 0.0f), VGet(320.0f, 300.0f, 0.0f), 40.0f, 8, GetColor(255, 0, 255), GetColor(255, 255, 255), TRUE);
+
+	// カメラ
+
+	// モデルの読み込み
+	ModelHandle = MV1LoadModel("DxChara.x");
+
+	// ライティングの計算をしないように設定を変更
+	SetUseLighting(FALSE);
+
+	// モデルをカメラの映る位置に移動
+	MV1SetPosition(ModelHandle, VGet(320.0f, -300.0f, 600.0f));
+
+	// モデルを描画
+	MV1DrawModel(ModelHandle);
+
+	//  シェーダーを使って２Ｄポリゴンを描画
+
+	// ２ポリゴン分の頂点のデータをセットアップ
+	Vertex[0].pos = VGet(2.0f, 540.0f,0.0f);
+	Vertex[0].norm = VGet(0.0f, 0.0f, -1.0f);
+	Vertex[0].dif = GetColorU8(255, 0, 255, 255);
+	Vertex[0].spc = GetColorU8(0, 0, 0, 0);
+	Vertex[0].u = 0.0f;
+	Vertex[0].v = 0.0f;
+	Vertex[0].su = 0.0f;
+	Vertex[0].sv = 0.0f;
+
+	Vertex[1].pos = VGet(420.0f, 340.0f, 0.0f);
+	Vertex[1].norm = VGet(0.0f, 0.0f, -1.0f);
+	Vertex[1].dif = GetColorU8(0, 0, 255, 255);
+	Vertex[1].spc = GetColorU8(0, 0, 0, 0);
+	Vertex[1].u = 1.0f;
+	Vertex[1].v = 0.0f;
+	Vertex[1].su = 0.0f;
+	Vertex[1].sv = 0.0f;
+
+	Vertex[2].pos = VGet(220.0f, 140.0f, 0.0f);
+	Vertex[2].norm = VGet(0.0f, 0.0f, -1.0f);
+	Vertex[2].dif = GetColorU8(255, 255, 0, 255);
+	Vertex[2].spc = GetColorU8(0, 0, 0, 0);
+	Vertex[2].u = 0.0f;
+	Vertex[2].v = 1.0f;
+	Vertex[2].su = 0.0f;
+	Vertex[2].sv = 0.0f;
+
+	Vertex[3].pos = VGet(420.0f, 140.0f, 0.0f);
+	Vertex[3].norm = VGet(0.0f, 0.0f, -1.0f);
+	Vertex[3].dif = GetColorU8(255, 255, 0, 255);
+	Vertex[3].spc = GetColorU8(0, 0, 0, 0);
+	Vertex[3].u = 1.0f;
+	Vertex[3].v = 1.0f;
+	Vertex[3].su = 0.0f;
+	Vertex[3].sv = 0.0f;
+
+	// ２ポリゴン分の頂点番号配列をセットアップ
+	Index[0] = 0;
+	Index[1] = 1;
+	Index[2] = 2;
+	Index[3] = 2;
+	Index[4] = 1;
+	Index[5] = 3;
+
+	// 頂点シェーダーを読み込む
+	vshandle = LoadVertexShader("VertexShaderTestVS.vso");
+
+	// ピクセルシェーダーを読み込む
+	pshandle = LoadPixelShader("VertexShaderTestPS.pso");
+
+	// 描画に使用する画像の読み込み
+	texhandle = LoadGraph("Tex1.bmp");
+
+	// 描画先を裏画面にする
+	SetDrawScreen(DX_SCREEN_BACK);
+
+	// 表示座標を移動する処理の初期化
+	x = 0;
+	xadd = 8;
+
+	// 色を変化させる処理の初期化
+	color = 0.0f;
+	coloradd = 1.0f / 60.0f;
+
+	// ESCキーが押されるまでループ
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	{
+		// 画面を初期化
+		ClearDrawScreen();
+
+		// 座標を移動させる
+		x += xadd;
+		if (x > 200 || x < -200)
+		{
+			xadd = -xadd;
+		}
+
+		// 色の値を変化させる
+		color += coloradd;
+		if (color <= 0.0f || color >= 1.0f)
+		{
+			coloradd = -coloradd;
+		}
+
+		// 座標値を頂点シェーダー float4型定数０番にセット
+		f4.x = (float)x;
+		f4.y = 0.0f;
+		f4.z = 0.0f;
+		f4.w = 0.0f;
+		SetVSConstF(0, f4);
+
+		// 色の値をピクセルシェーダー float4型定数０番にセット
+		f4.x = color;
+		f4.y = color;
+		f4.z = color;
+		f4.w = 1.0f;
+		SetPSConstF(0, f4);
+
+		// 使用する頂点シェーダーのセット
+		SetUseVertexShader(vshandle);
+
+		// 使用するピクセルシェーダーをセット
+		SetUsePixelShader(pshandle);
+
+		// 使用するテクスチャを０番にセット
+		SetUseTextureToShader(0, texhandle);
+
+		// シェーダーを使用した２ポリゴンの描画
+		DrawPolygonIndexed3DToShader(Vertex, 4, Index, 2);
+
+		// 裏画面の内容を表画面に反映させる
+		ScreenFlip();
 	}
 
-	//移動係数
-	float move = 1.0f;
+	// 使用した頂点シェーダーの float4型定数の設定を無効化する
+	ResetVSConstF(0, 2);
 
-	//横方向と縦方向のカウント数。
-	int xcount = 0, ycount = 0;
+	// 使用したピクセルシェーダーの float4型定数の設定を無効化する
+	ResetPSConstF(0, 1);
 
-	//添字用変数
-	int ix = 0, iy = 0, result = 0;
+	// 読み込んだ頂点シェーダーの削除
+	DeleteShader(vshandle);
 
-	while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0 && GetHitKeyStateAll(key) == 0) {
-		if (key[KEY_INPUT_LEFT] == 1 || key[KEY_INPUT_RIGHT] == 1) {
-			if (key[KEY_INPUT_UP] == 1 || key[KEY_INPUT_DOWN] == 1) {
-				//移動係数を０．７１に設定
-				move = 0.71f;
-			} else {
-				//斜めじゃなければ１．０に設定
-				move = 1.0f;
-			}
-		} else if (key[KEY_INPUT_UP] == 1 || key[KEY_INPUT_DOWN] == 1) {
-			move = 1.0f;
-		}
+	// 読み込んだピクセルシェーダーの削除
+	DeleteShader(pshandle);
 
-		if (key[KEY_INPUT_LEFT] == 1) {
-			x -= (int) 4 * move;
-		}
-		if (key[KEY_INPUT_RIGHT] == 1) {
-			x += (int) 4 * move;
-		}
-		if (key[KEY_INPUT_UP] == 1) {
-			y -= (int) 4 * move;
-		}
-		if (key[KEY_INPUT_DOWN] == 1) {
-			y += (int) 4 * move;
-		}
-
-		//左キーが押されてて、かつxcountが０以上なら０にしてから１引く。
-		//それ以外は１引く
-		if (key[KEY_INPUT_LEFT] == 1) {
-			if (xcount > 0) {
-				xcount = 0;
-			}
-			--xcount;
-		}
-
-		//右キーが押されてて、かつxcountが０以下なら０にしてから１足す。
-		//それ以外は１引く
-		if (key[KEY_INPUT_RIGHT] == 1) {
-			if (xcount < 0) {
-				xcount = 0;
-			}
-			++xcount;
-		}
-
-		//上キーが押されてて、かつycountが０以上なら０にしてから１引く。
-		//それ以外は１引く
-		if (key[KEY_INPUT_UP] == 1) {
-			if (ycount > 0) {
-				ycount = 0;
-			}
-			--ycount;
-		}
-
-		//下キーが押されてて、かつycountが０以下なら０にしてから１足す。
-		//それ以外は１足す
-		if (key[KEY_INPUT_DOWN] == 1) {
-			if (ycount < 0) {
-				ycount = 0;
-			}
-			++ycount;
-		}
-
-		//カウント数から添字を求める。
-		ix = abs(xcount) % 30 / 10;
-		iy = abs(ycount) % 30 / 10;
-
-		if (xcount > 0) {
-			//xカウントがプラスなら右向きなので2行目の先頭添字番号を足す。
-			ix += 3;
-			result = ix;
-		} else if (xcount < 0) {
-			//マイナスなら左向きなので、4行目の先頭添字番号を足す。
-			ix += 9;
-			result = ix;
-		}
-
-		if (ycount > 0) {
-			//yカウントがプラスなら下向きなので、3行目の先頭添字番号を足す。
-			iy += 6;
-			result = iy;
-		} else if (ycount < 0) {
-			//１行目の先頭添字番号は０なので何もする必要なし。(分かりやすくするために書いときました)
-			iy += 0;
-			result = iy;
-		}
-
-		//斜め移動の場合は横顔を優先
-		if (move == 0.71f) {
-			result = ix;
-		}
-
-		//描画
-		DrawGraph(x, y, gh[result], TRUE);
-
-		//押されてなければカウントをゼロにする。
-		if (key[KEY_INPUT_LEFT] != 1 && key[KEY_INPUT_RIGHT] != 1) {
-			xcount = 0;
-		}
-
-		if (key[KEY_INPUT_UP] != 1 && key[KEY_INPUT_DOWN] != 1) {
-			ycount = 0;
-		}
-
-		if (key[KEY_INPUT_ESCAPE] == 1) {
-			break;
-		}
-
-	}
+	// キー入力待ちをする
+	WaitKey();
 
 	DxLib_End();
 }
